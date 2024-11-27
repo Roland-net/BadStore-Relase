@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Оформление</title>
+    <link rel="stylesheet" href="style/oform.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="wrapper">
+        <form id="orderForm">
+            <h1>Оформление</h1>
+                
+            <div class="input-box">
+                <select name="model" required>
+                    <option value="" disabled selected>Выберите модель</option>
+                    <option value="Евро диван в стиле лофт">Евро диван в стиле лофт</option>
+                    <option value="Мини диваны раскладной">Мини диваны раскладной</option>
+                </select>
+                <i class='bx bxs-hotel'></i>
+            </div>
+
+            <div class="input-box">
+                <select name="color" required>
+                    <option value="" disabled selected>Выберите цвет и тип ткани</option>
+                    <option value="Антивандальный">Антивандальный  </option>
+                    <option value="Матовый микро велюр">Матовый микро велюр </option>
+                    <option value="Барахатный микро велюр">Барахатный микро велюр</option>
+                </select>
+                <i class='bx bxs-palette'></i>
+            </div>
+           
+
+            <div class="input-box">
+                <input type="text" name="namePoluchateln" placeholder="Имя получателя" required>
+                <i class='bx bx-user'></i>
+            </div>
+
+            <div class="input-box">
+                <input type="text" name="addrress" placeholder="Адрес (подезд, этаж, кв)" required>
+                <i class='bx bxs-home'></i>
+            </div>
+
+            <div class="input-box">
+                <input type="text" name="phone" placeholder="Телефон для связи" required>
+                <i class='bx bxs-phone'></i>
+            </div>
+            <div class="input-box">
+                <input type="date" name="dataOrders" required>
+                <i class='bx bxs-calendar'></i>
+            </div>
+            
+            <button type="submit" class="btn">Оформить</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('orderForm').addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const formData = new FormData(e.target);
+            const data = Object.fromEntries(formData.entries());
+
+            try {
+                // Проверка статуса аутентификации
+                const authResponse = await fetch('/auth/check');
+                const authResult = await authResponse.json();
+
+                if (!authResult.authenticated) {
+                    alert('Пожалуйста, войдите в систему, чтобы оформить заказ');
+                    window.location.href = '/vh.html'; // Перенаправление на страницу входа
+                    return;
+                }
+
+                const response = await fetch('/order', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(data)
+                });
+
+                const result = await response.json();
+                if (response.ok) {
+                    alert(result.message);
+                    window.location.href = '/index.html'; // Перенаправление на главную страницу после успешного оформления заказа
+                } else {
+                    alert(result.message);
+                }
+            } catch (error) {
+                console.error('Ошибка:', error);
+                alert('Произошла ошибка при оформлении заказа');
+            }
+        });
+    </script>
+</body>
+</html>

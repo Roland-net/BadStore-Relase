@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Регистрация</title>
+    <link rel="stylesheet" href="style/reg.css">
+    <link href='https://unpkg.com/boxicons@2.1.4/css/boxicons.min.css' rel='stylesheet'>
+</head>
+<body>
+    <div class="wrapper">
+        <form id="registerForm">
+            <h1>Регистрация</h1>
+            <div class="input-box">
+                <input type="text" id="Name" placeholder="Имя" required>
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="input-box">
+                <input type="text" id="FirstName" placeholder="Фамилия" required>
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="input-box">
+                <input type="text" id="patronymic" placeholder="Очество">
+                <i class='bx bx-user'></i>
+            </div>
+            <div class="input-box">
+                <input type="text" id="email" placeholder="Почта" required>
+                <i class='bx bxl-gmail'></i>
+            </div>
+            <div class="input-box">
+                <input type="password" id="password" placeholder="Пароль" required>
+                <i class='bx bxs-lock-alt'></i>
+            </div>
+            <button type="submit" class="btn">Зарегистрироваться</button>
+            <div class="register-link">
+                <p>Аккаунт уже есть? <a href="vh.html">Вход</a></p>
+            </div>
+        </form>
+    </div>
+
+    <script>
+       document.getElementById('registerForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    // Исправленные идентификаторы
+    const Name = document.getElementById('Name').value;
+    const FirstName = document.getElementById('FirstName').value;
+    const patronymic = document.getElementById('patronymic').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+
+    try {
+        const response = await fetch('/auth/register', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ Name, FirstName, patronymic, email, password })
+        });
+
+        const result = await response.json();
+        if (response.ok) {
+            alert(result.message);
+            window.location.href = 'vh.html';
+        } else {
+            alert(result.message);
+        }
+    } catch (error) {
+        console.error('Ошибка:', error);
+        alert('Произошла ошибка при регистрации');
+    }
+});
+
+    </script>
+</body>
+</html>
