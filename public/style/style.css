@@ -709,6 +709,8 @@ button {
 
     .burger-menu {
         display: block;
+        position: relative;
+        left: -40px; /* Смещение на 10 пикселей влево */
     }
 
     .nav,
