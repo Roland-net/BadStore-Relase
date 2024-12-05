@@ -204,6 +204,6 @@ app.post('/order', async (req, res) => {
 
 app.use(express.static('public'));
 
-app.listen(3000, () => {
-    console.log('Сервер запущен по порту 3000');
+app.listen(5000, () => {
+    console.log('Сервер запущен по адресу http://192.168.1.9:5000');
 });
