@@ -56,8 +56,6 @@ app.post('/auth/register', async (req, res) => {
         }
 
          
-         
-
         const [rows, fields] = await connection.execute(
             'INSERT INTO Customers (UserName, FirstName, patronymic, email, userpassword) VALUES (?, ?, ?, ?, ?)',
             [Name, FirstName, patronymic || null, email, password]
@@ -79,17 +77,19 @@ app.post('/auth/login', async (req, res) => {
     try {
         const connection = await mysql.createConnection(dbConfig);
 
-        // Проверка на корректность email
-        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        if (!emailRegex.test(email)) {
-            return res.status(400).json({ message: 'Некорректный email' });
-        }
+        
 
         const [rows, fields] = await connection.execute(
             'SELECT * FROM Customers WHERE email = ? AND userpassword = ?',
             [email, password]
         );
 
+        // Проверка на корректность email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'Некорректный email' });
+        }
+        
         if (rows.length > 0) {
             req.session.user = rows[0]; // Сохраняем информацию о пользователе в сессии
             res.status(200).json({ message: 'Успешный вход', user: rows[0] });
@@ -196,7 +196,7 @@ app.post('/order', async (req, res) => {
 
         res.status(201).json({ message: 'Заказ успешно оформлен' });
     } catch (err) {
-        console.error('0шибка при вставке данных:', err);
+        console.error('Ошибка при вставке данных:', err);
         res.status(500).json({ message: 'Ошибка сервера' });
     }
 });
@@ -204,6 +204,6 @@ app.post('/order', async (req, res) => {
 
 app.use(express.static('public'));
 
-app.listen(5000, () => {
-    console.log('Сервер запущен по порту 5000');
+app.listen(3000, () => {
+    console.log('Сервер запущен по порту 3000');
 });
