@@ -196,7 +196,7 @@ app.post('/order', async (req, res) => {
 
         res.status(201).json({ message: 'Заказ успешно оформлен' });
     } catch (err) {
-        console.error('Ошибка при вставке данных:', err);
+        console.error('0шибка при вставке данных:', err);
         res.status(500).json({ message: 'Ошибка сервера' });
     }
 });
