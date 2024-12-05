@@ -12,14 +12,14 @@ app.use(session({
     secret: 'your_secret_key',
     resave: false,
     saveUninitialized: true,
-    cookie: { secure: false }
+    cookie: { secure: false } 
 }));
 
 const dbConfig = {
     host: 'localhost',
-    user: 'root',
-    password: 'Tima2006',
-    database: 'badstore'
+    user: 'root', 
+    password: 'Roland11.', 
+    database: 'divan' 
 };
 
 
@@ -39,22 +39,31 @@ testConnection();
 app.post('/auth/register', async (req, res) => {
     const { Name, FirstName, patronymic, email, password } = req.body;
 
-    console.log('Данные от клиента:', req.body);
+    console.log('Данные от клиента:', req.body); 
 
     try {
         const connection = await mysql.createConnection(dbConfig);
 
-
+        // Проверка на заполнение обязательных полей
         if (!Name || !FirstName || !email || !password) {
             return res.status(400).json({ message: 'Не все обязательные поля заполнены' });
         }
+
+        // Проверка на корректность email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'Некорректный email' });
+        }
+
+         
+         
 
         const [rows, fields] = await connection.execute(
             'INSERT INTO Customers (UserName, FirstName, patronymic, email, userpassword) VALUES (?, ?, ?, ?, ?)',
             [Name, FirstName, patronymic || null, email, password]
         );
 
-        console.log('Данные успешно вставлены:', rows);
+        console.log('Данные успешно вставлены:', rows); 
 
         res.status(201).json({ message: 'Пользователь успешно зарегистрирован' });
     } catch (err) {
@@ -65,21 +74,27 @@ app.post('/auth/register', async (req, res) => {
 
 // Роут для входа
 app.post('/auth/login', async (req, res) => {
-    const { username, password } = req.body;
+    const { email, password } = req.body;
 
     try {
         const connection = await mysql.createConnection(dbConfig);
 
+        // Проверка на корректность email
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(email)) {
+            return res.status(400).json({ message: 'Некорректный email' });
+        }
+
         const [rows, fields] = await connection.execute(
-            'SELECT * FROM Customers WHERE UserName = ? AND userpassword = ?',
-            [username, password]
+            'SELECT * FROM Customers WHERE email = ? AND userpassword = ?',
+            [email, password]
         );
 
         if (rows.length > 0) {
             req.session.user = rows[0]; // Сохраняем информацию о пользователе в сессии
             res.status(200).json({ message: 'Успешный вход', user: rows[0] });
         } else {
-            res.status(401).json({ message: 'Неверное имя пользователя или пароль' });
+            res.status(401).json({ message: 'Неверный email или пароль' });
         }
     } catch (err) {
         console.error(err);
@@ -109,7 +124,7 @@ app.get('/orders', async (req, res) => {
 
         // Получение списка заказов пользователя
         const [rows] = await connection.execute(
-            `SELECT Orders.IdOrders, Divan.NameDivan, Divan.Price
+            `SELECT Orders.IdOrders, Divan.NameDivan, Divan.Price, Orders.Status
              FROM Orders
              JOIN Divan ON Orders.IdDivan = Divan.IdDivan
              WHERE Orders.IdCustomers = ?`,
@@ -135,14 +150,15 @@ app.post('/auth/logout', (req, res) => {
     });
 });
 
+
 // Роут для оформления заказа
 app.post('/order', async (req, res) => {
     const { model, color, namePoluchateln, addrress, phone, dataOrders } = req.body;
 
-    console.log('Данные от клиента:', req.body);
+    console.log('Данные от клиента:', req.body); 
+
     try {
         const connection = await mysql.createConnection(dbConfig);
-
 
         const IdCustomers = req.session.user ? req.session.user.IdCustomers : null;
 
@@ -162,10 +178,18 @@ app.post('/order', async (req, res) => {
 
         const IdDivan = divanRows[0].IdDivan;
 
+        // Проверка даты заказа
+        const currentDate = new Date();
+        const orderDate = dataOrders ? new Date(dataOrders) : currentDate;
+
+        if (orderDate < currentDate) {
+            return res.status(400).json({ message: 'Дата заказа не может быть в прошлом' });
+        }
+
         // Вставка данных в таблицу Orders
         const [orderRows] = await connection.execute(
             'INSERT INTO Orders (IdCustomers, IdDivan, NamePoluchateln, Addrress, Phone, DataOrders) VALUES (?, ?, ?, ?, ?, ?)',
-            [IdCustomers, IdDivan, namePoluchateln, addrress, phone, dataOrders]
+            [IdCustomers, IdDivan, namePoluchateln, addrress, phone, orderDate]
         );
 
         console.log('Данные успешно вставлены:', orderRows); // Вывод результата вставки
@@ -181,5 +205,5 @@ app.post('/order', async (req, res) => {
 app.use(express.static('public'));
 
 app.listen(5000, () => {
-    console.log('Сервер запущен по адресу http://192.168.103.97:5000');
+    console.log('Сервер запущен по порту 5000');
 });

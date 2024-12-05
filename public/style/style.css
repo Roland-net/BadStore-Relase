@@ -377,6 +377,23 @@ body {
     color: #333; /* Цвет текста */
 }
 
+/* Медиа-запрос для ширины экрана до 1000px */
+@media (max-width: 1000px) {
+    .burgers-items {
+        flex-direction: column; /* Изменяем направление отображения на вертикальное */
+    }
+
+    .burger-item {
+        display: block;
+        margin-bottom: 20px; /* Добавляем отступ между элементами */
+    }
+
+    .burger-item img {
+        width: 100%; /* Делаем изображение на всю ширину */
+        margin-top: 30px;
+        padding-bottom: 20px;
+    }
+}
 
 .menu {
     background-image: url(Images/йцу.jpg);
